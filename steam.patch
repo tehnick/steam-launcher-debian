@@ -1,0 +1,14 @@
+--- a/steam-launcher_deb/usr/bin/steam
++++ b/steam-launcher_deb/usr/bin/steam
+@@ -3,6 +3,11 @@
+ # This is the Steam script that typically resides in /usr/bin
+ # It will create the Steam bootstrap if necessary and then launch steam.
+ 
++export STEAM_LIBS=/usr/lib/steam/i386-linux-gnu/
++export LD_LIBRARY_PATH=${STEAM_LIBS}:${LD_LIBRARY_PATH}
++export SDL_AUDIODRIVER=alsa
++#export LC_ALL=C
++
+ # Get the full name of this script
+ export STEAMSCRIPT="$(cd "${0%/*}" && echo "$PWD")/${0##*/}"
+ 

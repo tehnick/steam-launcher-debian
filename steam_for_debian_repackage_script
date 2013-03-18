@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# Author:  Boris Pek <tehnick-8@mail.ru>
+# License: Public Domain
+# Created: 2012-11-29
+# Updated: 2013-03-19
+# Version: N/A
+
+set -e
+
+export STEAM_VER_LIST="$(curl 'http://repo.steampowered.com/steam/pool/steam/s/steam/' 2>&1 | sed -ne 's:^.*steam-launcher_\(.*\)_all.deb.*$:\1:p')"
+if [ -z "${STEAM_VER}" ]; then
+    export STEAM_VER=$(echo "${STEAM_VER_LIST}" | sort -r -V | head -n1)
+fi
+echo "STEAM_VER = ${STEAM_VER}"
+
+#export LIBC_VER_LIST="$(curl 'http://ftp.de.debian.org/debian/pool/main/e/eglibc/' 2>&1 | sed -ne 's:^.*libc6_\(.*\)_i386.deb.*$:\1:p')"
+export LIBC_VER_LIST="$(curl 'http://security.ubuntu.com/ubuntu/pool/main/e/eglibc/' 2>&1 | sed -ne 's:^.*libc6_\(.*\)_i386.deb.*$:\1:p')"
+LIBC_VER=2.15-0ubuntu20.1
+if [ -z "${LIBC_VER}" ]; then
+    export LIBC_VER=$(echo "${LIBC_VER_LIST}" | sort -r -V | head -n1)
+fi
+echo "LIBC_VER = ${LIBC_VER}"
+
+mkdir -p tmp
+cd tmp
+
+if !([ -e "steam-launcher_${STEAM_VER}_all.deb" ]); then
+    wget -4 -c "http://repo.steampowered.com/steam/pool/steam/s/steam/steam-launcher_${STEAM_VER}_all.deb"
+fi
+
+if !([ -e "libc6_${LIBC_VER}_i386.deb" ]); then
+    #wget -4 -c "http://ftp.de.debian.org/debian/pool/main/e/eglibc/libc6_${LIBC_VER}_i386.deb"
+    wget -4 -c "http://security.ubuntu.com/ubuntu/pool/main/e/eglibc/libc6_${LIBC_VER}_i386.deb"
+fi
+
+
+rm -rf steam-launcher_deb
+dpkg -x steam-launcher_${STEAM_VER}_all.deb steam-launcher_deb
+dpkg -e steam-launcher_${STEAM_VER}_all.deb steam-launcher_deb/DEBIAN
+
+rm -rf libc6_deb
+dpkg -x libc6_${LIBC_VER}_i386.deb libc6_deb
+
+
+rm steam-launcher_deb/DEBIAN/conffiles
+#rm steam-launcher_deb/DEBIAN/md5sums
+rm steam-launcher_deb/usr/bin/steamdeps
+rm -r steam-launcher_deb/etc
+
+mkdir -p steam-launcher_deb/usr/lib/steam/i386-linux-gnu/
+mv libc6_deb/lib/i386-linux-gnu/* steam-launcher_deb/usr/lib/steam/i386-linux-gnu/
+
+patch -p1 < ../steam.patch
+sed -e "s|jockey-common, ||" -i steam-launcher_deb/DEBIAN/control
+sed -e "s|libc6 (>= 2.15)|libc6|" -i steam-launcher_deb/DEBIAN/control
+
+cd ..
+
+dpkg -b tmp/steam-launcher_deb repackaged-steam_${STEAM_VER}_all.deb
+
+echo "Package is ready for installation:"
+echo "sudo dpkg -i repackaged-steam_${STEAM_VER}_all.deb"
+

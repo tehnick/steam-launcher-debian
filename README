@@ -1,0 +1,33 @@
+This is the special repository with scripts and patches for Steam deb-package:
+  http://repo.steampowered.com/steam/pool/steam/s/steam/
+  http://store.steampowered.com/about/
+
+Here is the list of advantages of repackaged deb-package:
+* Dangerous script is deleted from package: /usr/bin/steamdeps
+* Extra files are deleted from package: /etc/apt/*
+* Package dependencies are updated, so package can be easily installed into
+  Debian >= 7.0 (Wheezy) without any extra actions.
+* Necessary libraries from Ubuntu libc6 package are added into repackaged steam
+  package and launching script is patched. So you do not have to update your
+  system libc6 package to make Steam work. Just launch steam after package
+  installation.
+
+If Steam does not start on the first try, read its console output carefully.
+For example, you may catch such error in Debian:
+  [0318/235903:ERROR:shared_memory_posix.cc(167)] Creating shared memory in
+  /dev/shm/org.chromium.Chromium.shmem.libcef_16076686305058492654 failed:
+  Permission denied
+  [0318/235903:ERROR:shared_memory_posix.cc(170)] Unable to access(W_OK|X_OK)
+  /dev/shm: Permission denied
+  [0318/235903:FATAL:shared_memory_posix.cc(172)] This is frequently caused by
+  incorrect permissions on /dev/shm.  Try 'sudo chmod 1777 /dev/shm' to fix.
+
+As you see solution is simple:
+$ sudo chmod 1777 /dev/shm
+
+This repo was created by Boris Pek <tehnick-8@mail.ru>. License: Public Domain.
+Please contact me if you have any troubles with this repo.
+
+If you find bugs or problems in Steam, you may open bug reports here:
+https://github.com/ValveSoftware/steam-for-linux
+
