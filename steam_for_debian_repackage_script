@@ -3,8 +3,10 @@
 # Author:  Boris Pek <tehnick-8@mail.ru>
 # License: Public Domain
 # Created: 2012-11-29
-# Updated: 2013-03-19
+# Updated: 2013-04-09
 # Version: N/A
+# Description: script for Debian Wheezy
+# Only libc6 = 2.13 is available here, so extra libraries are required
 
 set -e
 
