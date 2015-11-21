@@ -19,7 +19,7 @@ echo "STEAM_VER = ${STEAM_VER}"
 mkdir -p tmp
 cd tmp
 
-if !([ -e "steam-launcher_${STEAM_VER}_all.deb" ]); then
+if [ ! -e "steam-launcher_${STEAM_VER}_all.deb" ]; then
     wget -4 -c "http://repo.steampowered.com/steam/pool/steam/s/steam/steam-launcher_${STEAM_VER}_all.deb"
 fi
 
