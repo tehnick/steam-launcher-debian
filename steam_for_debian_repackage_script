@@ -33,6 +33,8 @@ rm steam-launcher_deb/usr/bin/steamdeps
 rm -r steam-launcher_deb/etc
 
 sed -e "s|jockey-common, ||" -i steam-launcher_deb/DEBIAN/control
+sed -e "s|/usr/bin/steam|LD_PRELOAD='/usr/\$LIB/libgpg-error.so' /usr/bin/steam|" \
+    -i steam-launcher_deb/usr/share/applications/steam.desktop
 
 cd ..
 
